@@ -1,0 +1,7 @@
+{
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/_build/GeminiRelayDriver/default/compile_commands.json",
+  "C_Cpp.default.intelliSenseMode": "macos-gcc-x64",
+  "C_Cpp.default.cppStandard": "c++17",
+  "C_Cpp.default.cStandard": "c11",
+  "cmake.sourceDirectory": "/Users/jdf/MPLABProjects/GeminiRelayDriver/cmake/GeminiRelayDriver/default"
+}

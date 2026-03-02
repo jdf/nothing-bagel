@@ -1,0 +1,5 @@
+# ninja log v7
+2	198	1771907259402219076	CMakeFiles/GeminiRelayDriver_default_default_AVR_GCC_compile.dir/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c.o	d3d092a3a0015563
+198	634	1771907259598166926	/Users/jdf/MPLABProjects/GeminiRelayDriver/out/GeminiRelayDriver/default.elf	74f2a9faf3849699
+1	173	1772419990447433378	CMakeFiles/GeminiRelayDriver_default_default_AVR_GCC_compile.dir/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c.o	d3d092a3a0015563
+173	753	1772419990619805287	/Users/jdf/MPLABProjects/GeminiRelayDriver/out/GeminiRelayDriver/default.elf	74f2a9faf3849699

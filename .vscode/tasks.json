@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "inputs": [
+        {
+            "id": "serialPort",
+            "type": "promptString",
+            "description": "Enter the serial port for Arduino ISP",
+            "default": "/dev/cu.usbmodem64E8336547602"
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Build project",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "_build/GeminiRelayDriver/default"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Build and Upload to ATtiny85 (Arduino ISP)",
+            "type": "shell",
+            "command": "avrdude",
+            "args": [
+                "-v",
+                "-p", "t85",
+                "-c", "avrisp",
+                "-b", "19200",
+                "-P", "${input:serialPort}",
+                "-U", "flash:w:out/GeminiRelayDriver/default.hex:i"
+            ],
+            "dependsOn": "Build project",
+            "group": "test",
+            "problemMatcher": []
+        }
+    ]
+}

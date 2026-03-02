@@ -1,0 +1,39 @@
+{
+    "version": "1.8",
+    "configurations": [
+        {
+            "name": "default",
+            "id": "conf1",
+            "device": "ATtiny85",
+            "imagePath": "./out/GeminiRelayDriver/default.elf",
+            "packs": [
+                {
+                    "name": "ATtiny_DFP",
+                    "vendor": "Microchip",
+                    "version": "3.3.272"
+                }
+            ],
+            "fileSet": "default",
+            "toolchain": "default-AVR-GCC"
+        }
+    ],
+    "propertyGroups": [
+        {
+            "name": "default-AVR-GCC",
+            "type": "toolchain",
+            "provider": "microchip.toolchains:avr-gcc@7.3.0",
+            "properties": {}
+        }
+    ],
+    "fileSets": [
+        {
+            "name": "default",
+            "files": [
+                {
+                    "include": "**/*",
+                    "exclude": "**/(_build|out|cmake|.vscode)/**/*"
+                }
+            ]
+        }
+    ]
+}

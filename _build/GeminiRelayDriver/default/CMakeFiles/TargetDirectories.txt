@@ -1,0 +1,4 @@
+/Users/jdf/MPLABProjects/GeminiRelayDriver/_build/GeminiRelayDriver/default/CMakeFiles/GeminiRelayDriver_default_default_AVR_GCC_compile.dir
+/Users/jdf/MPLABProjects/GeminiRelayDriver/_build/GeminiRelayDriver/default/CMakeFiles/GeminiRelayDriver_default_image__fWvdbmM.dir
+/Users/jdf/MPLABProjects/GeminiRelayDriver/_build/GeminiRelayDriver/default/CMakeFiles/edit_cache.dir
+/Users/jdf/MPLABProjects/GeminiRelayDriver/_build/GeminiRelayDriver/default/CMakeFiles/rebuild_cache.dir
