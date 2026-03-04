@@ -1,3 +1,4 @@
+#include <avr/eeprom.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/sleep.h>
@@ -14,6 +15,9 @@
 volatile uint8_t wdt_checkin_flag = 0;
 volatile uint8_t btn_pressed_flag = 0;
 uint8_t relay_is_set = 0;
+
+// Define a persistent byte in EEPROM
+uint8_t EEMEM stored_relay_state;
 
 // Timer0 Compare A Interrupt - Fires every 10ms
 ISR(TIMER0_COMPA_vect) {
@@ -79,6 +83,14 @@ int main(void) {
   OCR0A = 155;                        // Compare match value
   TIMSK = (1 << OCIE0A);              // Enable Timer0 Compare Match A Interrupt
 
+  // Read last known state from EEPROM
+  relay_is_set = eeprom_read_byte(&stored_relay_state);
+
+  // Sanity check (EEPROM defaults to 0xFF on fresh chips)
+  if (relay_is_set > 1) {
+    relay_is_set = 0; // Default to 0 if invalid
+  }
+
   // --- Sleep Setup ---
   set_sleep_mode(SLEEP_MODE_IDLE);
   sleep_enable();
@@ -99,6 +111,7 @@ int main(void) {
     if (btn_pressed_flag) {
       btn_pressed_flag = 0;
       toggle_relay(); // Transition on switch close
+      eeprom_update_byte(&stored_relay_state, relay_is_set);
     }
   }
 

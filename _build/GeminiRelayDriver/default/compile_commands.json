@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/Users/jdf/MPLABProjects/GeminiRelayDriver/_build/GeminiRelayDriver/default",
-  "command": "/Users/jdf/.mplab/app-finder/apps/avr-gcc/v7.3.0/avr8-gnu-toolchain-darwin_x86_64/bin/avr-gcc -DDEBUG -DF_CPU=1000000UL -D__ATtiny85__ -Ddefault=default -I/Users/jdf/.mchp_packs/Microchip/ATtiny_DFP/3.3.272/include -x c -g -gdwarf-2 -mmcu=attiny85 -B/Users/jdf/.mchp_packs/Microchip/ATtiny_DFP/3.3.272/gcc/dev/attiny85 -x c -c -funsigned-char -funsigned-bitfields -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -Wall -o CMakeFiles/GeminiRelayDriver_default_default_AVR_GCC_compile.dir/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c.o -c /Users/jdf/MPLABProjects/GeminiRelayDriver/main.c",
-  "file": "/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c",
-  "output": "/Users/jdf/MPLABProjects/GeminiRelayDriver/_build/GeminiRelayDriver/default/CMakeFiles/GeminiRelayDriver_default_default_AVR_GCC_compile.dir/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c.o"
-}
-]

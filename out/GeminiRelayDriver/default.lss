@@ -3,19 +3,20 @@ default.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn  Flags
-  0 .text         0000015c  00000000  00000000  00000094  2**1  CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000002  00800060  0000015c  000001f0  2**0  CONTENTS, ALLOC, LOAD, DATA
-  2 .bss          00000004  00800062  00800062  000001f2  2**0  ALLOC
-  3 .comment      0000002f  00000000  00000000  000001f2  2**0  CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000224  2**2  CONTENTS, READONLY
-  5 .debug_aranges 00000030  00000000  00000000  00000260  2**0  CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   0000066a  00000000  00000000  00000290  2**0  CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000551  00000000  00000000  000008fa  2**0  CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000003e0  00000000  00000000  00000e4b  2**0  CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000058  00000000  00000000  0000122c  2**2  CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000003ad  00000000  00000000  00001284  2**0  CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000104  00000000  00000000  00001631  2**0  CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000020  00000000  00000000  00001735  2**0  CONTENTS, READONLY, DEBUGGING
+  0 .text         000001ac  00000000  00000000  000000b4  2**1  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000002  00800060  000001ac  00000260  2**0  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000004  00800062  00800062  00000262  2**0  ALLOC
+  3 .eeprom       00000001  00810000  00810000  00000262  2**0  CONTENTS, ALLOC, LOAD, DATA
+  4 .comment      0000002f  00000000  00000000  00000263  2**0  CONTENTS, READONLY
+  5 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000294  2**2  CONTENTS, READONLY
+  6 .debug_aranges 00000070  00000000  00000000  000002d0  2**3  CONTENTS, READONLY, DEBUGGING
+  7 .debug_info   0000081e  00000000  00000000  00000340  2**0  CONTENTS, READONLY, DEBUGGING
+  8 .debug_abbrev 000005b1  00000000  00000000  00000b5e  2**0  CONTENTS, READONLY, DEBUGGING
+  9 .debug_line   00000535  00000000  00000000  0000110f  2**0  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_frame  00000058  00000000  00000000  00001644  2**2  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_str    000003e9  00000000  00000000  0000169c  2**0  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_loc    00000104  00000000  00000000  00001a85  2**0  CONTENTS, READONLY, DEBUGGING
+ 13 .debug_ranges 00000020  00000000  00000000  00001b89  2**0  CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
 
@@ -72,7 +73,7 @@ __do_copy_data():
   2a:	10 e0       	ldi	r17, 0x00	; 0
   2c:	a0 e6       	ldi	r26, 0x60	; 96
   2e:	b0 e0       	ldi	r27, 0x00	; 0
-  30:	ec e5       	ldi	r30, 0x5C	; 92
+  30:	ec ea       	ldi	r30, 0xAC	; 172
   32:	f1 e0       	ldi	r31, 0x01	; 1
   34:	02 c0       	rjmp	.+4      	; 0x3a <__do_copy_data+0x10>
   36:	05 90       	lpm	r0, Z+
@@ -99,7 +100,7 @@ __do_clear_bss():
 ../../../../crt1/gcrt1.S:314
   50:	57 d0       	rcall	.+174    	; 0x100 <main>
 ../../../../crt1/gcrt1.S:315
-  52:	82 c0       	rjmp	.+260    	; 0x158 <_exit>
+  52:	aa c0       	rjmp	.+340    	; 0x1a8 <_exit>
 
 00000054 <__bad_interrupt>:
 __vector_1():
@@ -108,10 +109,10 @@ __vector_1():
 
 00000056 <__vector_10>:
 __vector_10():
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:19
-volatile uint8_t wdt_checkin_flag = 0;
-volatile uint8_t btn_pressed_flag = 0;
-uint8_t relay_is_set = 0;
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:23
+
+// Define a persistent byte in EEPROM
+uint8_t EEMEM stored_relay_state;
 
 // Timer0 Compare A Interrupt - Fires every 10ms
 ISR(TIMER0_COMPA_vect) {
@@ -122,7 +123,7 @@ ISR(TIMER0_COMPA_vect) {
   5e:	11 24       	eor	r1, r1
   60:	8f 93       	push	r24
   62:	9f 93       	push	r25
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:25
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:29
   static uint8_t wdt_counter = 0;
   static uint8_t btn_history = 0xFF; // 8-bit history for debouncing
   static uint8_t btn_state = 1;      // 1 = released (pull-up high), 0 = pressed
@@ -131,11 +132,11 @@ ISR(TIMER0_COMPA_vect) {
   wdt_counter++;
   64:	80 91 62 00 	lds	r24, 0x0062	; 0x800062 <__data_end>
   68:	8f 5f       	subi	r24, 0xFF	; 255
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:26
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:30
   if (wdt_counter >= 25) { // 25 ticks * 10ms = 250ms
   6a:	89 31       	cpi	r24, 0x19	; 25
   6c:	c8 f4       	brcc	.+50     	; 0xa0 <__vector_10+0x4a>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:25
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:29
   static uint8_t wdt_counter = 0;
   static uint8_t btn_history = 0xFF; // 8-bit history for debouncing
   static uint8_t btn_state = 1;      // 1 = released (pull-up high), 0 = pressed
@@ -143,7 +144,7 @@ ISR(TIMER0_COMPA_vect) {
   // 1. Handle the Quarter-Second Watchdog Tick
   wdt_counter++;
   6e:	80 93 62 00 	sts	0x0062, r24	; 0x800062 <__data_end>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:33
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:37
     wdt_checkin_flag = 1; // Flag main loop to pat the dog
   }
 
@@ -151,11 +152,11 @@ ISR(TIMER0_COMPA_vect) {
   // Read PB2, isolate the bit, and shift it into our history byte
   uint8_t current_read = (PINB & (1 << BTN_PIN)) ? 1 : 0;
   72:	96 b3       	in	r25, 0x16	; 22
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:34
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:38
   btn_history = (btn_history << 1) | current_read;
-  74:	80 91 61 00 	lds	r24, 0x0061	; 0x800061 <btn_history.1641>
+  74:	80 91 61 00 	lds	r24, 0x0061	; 0x800061 <btn_history.1693>
   78:	88 0f       	add	r24, r24
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:33
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:37
     wdt_checkin_flag = 1; // Flag main loop to pat the dog
   }
 
@@ -165,21 +166,21 @@ ISR(TIMER0_COMPA_vect) {
   7a:	92 fb       	bst	r25, 2
   7c:	99 27       	eor	r25, r25
   7e:	90 f9       	bld	r25, 0
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:34
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:38
   btn_history = (btn_history << 1) | current_read;
   80:	89 2b       	or	r24, r25
-  82:	80 93 61 00 	sts	0x0061, r24	; 0x800061 <btn_history.1641>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:37
+  82:	80 93 61 00 	sts	0x0061, r24	; 0x800061 <btn_history.1693>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:41
 
   // Evaluate debounced state
   if (btn_history == 0x00 && btn_state == 1) {
   86:	81 11       	cpse	r24, r1
   88:	16 c0       	rjmp	.+44     	; 0xb6 <__vector_10+0x60>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:37 (discriminator 1)
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:41 (discriminator 1)
   8a:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
   8e:	81 30       	cpi	r24, 0x01	; 1
   90:	69 f0       	breq	.+26     	; 0xac <__vector_10+0x56>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:45
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:49
     btn_pressed_flag = 1; // Trigger relay transition on CLOSE
   } else if (btn_history == 0xFF && btn_state == 0) {
     // Switch has been solidly OPENED (high) for 80ms
@@ -193,7 +194,7 @@ ISR(TIMER0_COMPA_vect) {
   9a:	0f 90       	pop	r0
   9c:	1f 90       	pop	r1
   9e:	18 95       	reti
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:27
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:31
   static uint8_t btn_state = 1;      // 1 = released (pull-up high), 0 = pressed
 
   // 1. Handle the Quarter-Second Watchdog Tick
@@ -201,12 +202,12 @@ ISR(TIMER0_COMPA_vect) {
   if (wdt_counter >= 25) { // 25 ticks * 10ms = 250ms
     wdt_counter = 0;
   a0:	10 92 62 00 	sts	0x0062, r1	; 0x800062 <__data_end>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:28
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:32
     wdt_checkin_flag = 1; // Flag main loop to pat the dog
   a4:	81 e0       	ldi	r24, 0x01	; 1
   a6:	80 93 65 00 	sts	0x0065, r24	; 0x800065 <wdt_checkin_flag>
   aa:	e3 cf       	rjmp	.-58     	; 0x72 <__vector_10+0x1c>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:39
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:43
   btn_history = (btn_history << 1) | current_read;
 
   // Evaluate debounced state
@@ -214,38 +215,38 @@ ISR(TIMER0_COMPA_vect) {
     // Switch has been solidly CLOSED (low) for 80ms
     btn_state = 0;
   ac:	10 92 60 00 	sts	0x0060, r1	; 0x800060 <__DATA_REGION_ORIGIN__>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:40
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:44
     btn_pressed_flag = 1; // Trigger relay transition on CLOSE
   b0:	80 93 64 00 	sts	0x0064, r24	; 0x800064 <btn_pressed_flag>
   b4:	ee cf       	rjmp	.-36     	; 0x92 <__vector_10+0x3c>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:41
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:45
   } else if (btn_history == 0xFF && btn_state == 0) {
   b6:	8f 3f       	cpi	r24, 0xFF	; 255
   b8:	61 f7       	brne	.-40     	; 0x92 <__vector_10+0x3c>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:41 (discriminator 1)
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:45 (discriminator 1)
   ba:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
   be:	81 11       	cpse	r24, r1
   c0:	e8 cf       	rjmp	.-48     	; 0x92 <__vector_10+0x3c>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:43
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:47
     // Switch has been solidly OPENED (high) for 80ms
     btn_state = 1; // State updated, but no action flagged
   c2:	81 e0       	ldi	r24, 0x01	; 1
   c4:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__DATA_REGION_ORIGIN__>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:45
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:49
   }
 }
   c8:	e4 cf       	rjmp	.-56     	; 0x92 <__vector_10+0x3c>
 
 000000ca <toggle_relay>:
 toggle_relay():
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:48
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:52
 
 void toggle_relay() {
   if (relay_is_set) {
   ca:	80 91 63 00 	lds	r24, 0x0063	; 0x800063 <relay_is_set>
   ce:	81 11       	cpse	r24, r1
   d0:	0c c0       	rjmp	.+24     	; 0xea <toggle_relay+0x20>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:56
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:60
     _delay_ms(10);
     PORTB &= ~(1 << RELAY_RESET);
     relay_is_set = 0;
@@ -268,19 +269,19 @@ _delay_ms():
   dc:	00 c0       	rjmp	.+0      	; 0xde <toggle_relay+0x14>
   de:	00 00       	nop
 toggle_relay():
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:58
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:62
     _delay_ms(10);
     PORTB &= ~(1 << RELAY_SET);
   e0:	c0 98       	cbi	0x18, 0	; 24
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:59
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:63
     relay_is_set = 1;
   e2:	81 e0       	ldi	r24, 0x01	; 1
   e4:	80 93 63 00 	sts	0x0063, r24	; 0x800063 <relay_is_set>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:61
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:65
   }
 }
   e8:	08 95       	ret
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:50
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:54
 }
 
 void toggle_relay() {
@@ -297,18 +298,18 @@ _delay_ms():
   f4:	00 c0       	rjmp	.+0      	; 0xf6 <toggle_relay+0x2c>
   f6:	00 00       	nop
 toggle_relay():
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:52
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:56
     _delay_ms(10);
     PORTB &= ~(1 << RELAY_RESET);
   f8:	c1 98       	cbi	0x18, 1	; 24
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:53
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:57
     relay_is_set = 0;
   fa:	10 92 63 00 	sts	0x0063, r1	; 0x800063 <relay_is_set>
   fe:	08 95       	ret
 
 00000100 <main>:
 main():
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:65
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:69
   }
 }
 
@@ -317,7 +318,7 @@ int main(void) {
   DDRB = (1 << RELAY_SET) | (1 << RELAY_RESET); // Relay pins as output
  100:	83 e0       	ldi	r24, 0x03	; 3
  102:	87 bb       	out	0x17, r24	; 23
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:66
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:70
   PORTB = (1 << BTN_PIN);                       // Enable pull-up on PB2 input
  104:	94 e0       	ldi	r25, 0x04	; 4
  106:	98 bb       	out	0x18, r25	; 24
@@ -338,7 +339,7 @@ void wdt_enable (const uint8_t value)
  114:	0f be       	out	0x3f, r0	; 63
  116:	21 bd       	out	0x21, r18	; 33
 main():
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:77
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:81
   // --- Timer0 Setup (10ms tick) ---
   // Assuming default 1MHz internal clock:
   // Prescaler 64 -> 1,000,000 / 64 = 15,625 Hz
@@ -347,81 +348,165 @@ main():
   TCCR0A = (1 << WGM01);              // CTC Mode
  118:	92 e0       	ldi	r25, 0x02	; 2
  11a:	9a bd       	out	0x2a, r25	; 42
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:78
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:82
   TCCR0B = (1 << CS01) | (1 << CS00); // Prescaler = 64
  11c:	83 bf       	out	0x33, r24	; 51
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:79
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:83
   OCR0A = 155;                        // Compare match value
  11e:	8b e9       	ldi	r24, 0x9B	; 155
  120:	89 bd       	out	0x29, r24	; 41
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:80
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:84
   TIMSK = (1 << OCIE0A);              // Enable Timer0 Compare Match A Interrupt
  122:	80 e1       	ldi	r24, 0x10	; 16
  124:	89 bf       	out	0x39, r24	; 57
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:83
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:87
+
+  // Read last known state from EEPROM
+  relay_is_set = eeprom_read_byte(&stored_relay_state);
+ 126:	80 e0       	ldi	r24, 0x00	; 0
+ 128:	90 e0       	ldi	r25, 0x00	; 0
+ 12a:	24 d0       	rcall	.+72     	; 0x174 <eeprom_read_byte>
+ 12c:	80 93 63 00 	sts	0x0063, r24	; 0x800063 <relay_is_set>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:90
+
+  // Sanity check (EEPROM defaults to 0xFF on fresh chips)
+  if (relay_is_set > 1) {
+ 130:	82 30       	cpi	r24, 0x02	; 2
+ 132:	10 f0       	brcs	.+4      	; 0x138 <main+0x38>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:91
+    relay_is_set = 0; // Default to 0 if invalid
+ 134:	10 92 63 00 	sts	0x0063, r1	; 0x800063 <relay_is_set>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:95
+  }
 
   // --- Sleep Setup ---
   set_sleep_mode(SLEEP_MODE_IDLE);
- 126:	85 b7       	in	r24, 0x35	; 53
- 128:	87 7e       	andi	r24, 0xE7	; 231
- 12a:	85 bf       	out	0x35, r24	; 53
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:84
+ 138:	85 b7       	in	r24, 0x35	; 53
+ 13a:	87 7e       	andi	r24, 0xE7	; 231
+ 13c:	85 bf       	out	0x35, r24	; 53
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:96
   sleep_enable();
- 12c:	85 b7       	in	r24, 0x35	; 53
- 12e:	80 62       	ori	r24, 0x20	; 32
- 130:	85 bf       	out	0x35, r24	; 53
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:85
+ 13e:	85 b7       	in	r24, 0x35	; 53
+ 140:	80 62       	ori	r24, 0x20	; 32
+ 142:	85 bf       	out	0x35, r24	; 53
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:97
   sei(); // Enable global interrupts
- 132:	78 94       	sei
- 134:	04 c0       	rjmp	.+8      	; 0x13e <main+0x3e>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:99
+ 144:	78 94       	sei
+ 146:	04 c0       	rjmp	.+8      	; 0x150 <main+0x50>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:111
     if (wdt_checkin_flag) {
       wdt_checkin_flag = 0;
       wdt_reset(); // Quarter-second check-in
     }
 
     if (btn_pressed_flag) {
- 136:	80 91 64 00 	lds	r24, 0x0064	; 0x800064 <btn_pressed_flag>
- 13a:	81 11       	cpse	r24, r1
- 13c:	09 c0       	rjmp	.+18     	; 0x150 <main+0x50>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:90
+ 148:	80 91 64 00 	lds	r24, 0x0064	; 0x800064 <btn_pressed_flag>
+ 14c:	81 11       	cpse	r24, r1
+ 14e:	09 c0       	rjmp	.+18     	; 0x162 <main+0x62>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:102
   sei(); // Enable global interrupts
 
   // --- Main Loop ---
   while (1) {
     // CPU enters IDLE mode. It will wake up every 10ms when Timer0 fires.
     sleep_cpu();
- 13e:	88 95       	sleep
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:94
+ 150:	88 95       	sleep
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:106
 
     // After waking up, check our flags:
 
     if (wdt_checkin_flag) {
- 140:	80 91 65 00 	lds	r24, 0x0065	; 0x800065 <wdt_checkin_flag>
- 144:	88 23       	and	r24, r24
- 146:	b9 f3       	breq	.-18     	; 0x136 <main+0x36>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:95
+ 152:	80 91 65 00 	lds	r24, 0x0065	; 0x800065 <wdt_checkin_flag>
+ 156:	88 23       	and	r24, r24
+ 158:	b9 f3       	breq	.-18     	; 0x148 <main+0x48>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:107
       wdt_checkin_flag = 0;
- 148:	10 92 65 00 	sts	0x0065, r1	; 0x800065 <wdt_checkin_flag>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:96
+ 15a:	10 92 65 00 	sts	0x0065, r1	; 0x800065 <wdt_checkin_flag>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:108
       wdt_reset(); // Quarter-second check-in
- 14c:	a8 95       	wdr
- 14e:	f3 cf       	rjmp	.-26     	; 0x136 <main+0x36>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:100
+ 15e:	a8 95       	wdr
+ 160:	f3 cf       	rjmp	.-26     	; 0x148 <main+0x48>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:112
     }
 
     if (btn_pressed_flag) {
       btn_pressed_flag = 0;
- 150:	10 92 64 00 	sts	0x0064, r1	; 0x800064 <btn_pressed_flag>
-/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:101
+ 162:	10 92 64 00 	sts	0x0064, r1	; 0x800064 <btn_pressed_flag>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:113
       toggle_relay(); // Transition on switch close
- 154:	ba df       	rcall	.-140    	; 0xca <toggle_relay>
- 156:	f3 cf       	rjmp	.-26     	; 0x13e <main+0x3e>
+ 166:	b1 df       	rcall	.-158    	; 0xca <toggle_relay>
+/Users/jdf/MPLABProjects/GeminiRelayDriver/main.c:114
+      eeprom_update_byte(&stored_relay_state, relay_is_set);
+ 168:	60 91 63 00 	lds	r22, 0x0063	; 0x800063 <relay_is_set>
+ 16c:	80 e0       	ldi	r24, 0x00	; 0
+ 16e:	90 e0       	ldi	r25, 0x00	; 0
+ 170:	09 d0       	rcall	.+18     	; 0x184 <eeprom_update_byte>
+ 172:	ee cf       	rjmp	.-36     	; 0x150 <main+0x50>
 
-00000158 <_exit>:
+00000174 <eeprom_read_byte>:
+eeprom_read_byte():
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eerd_byte.S:91
+ 174:	e1 99       	sbic	0x1c, 1	; 28
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eerd_byte.S:92
+ 176:	fe cf       	rjmp	.-4      	; 0x174 <eeprom_read_byte>
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eerd_byte.S:95
+ 178:	9f bb       	out	0x1f, r25	; 31
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eerd_byte.S:101
+ 17a:	8e bb       	out	0x1e, r24	; 30
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eerd_byte.S:102
+ 17c:	e0 9a       	sbi	0x1c, 0	; 28
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eerd_byte.S:103
+ 17e:	99 27       	eor	r25, r25
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eerd_byte.S:104
+ 180:	8d b3       	in	r24, 0x1d	; 29
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eerd_byte.S:105
+ 182:	08 95       	ret
+
+00000184 <eeprom_update_byte>:
+eeprom_update_byte():
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:48
+ 184:	26 2f       	mov	r18, r22
+
+00000186 <eeprom_update_r18>:
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:65
+ 186:	e1 99       	sbic	0x1c, 1	; 28
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:66
+ 188:	fe cf       	rjmp	.-4      	; 0x186 <eeprom_update_r18>
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:70
+ 18a:	9f bb       	out	0x1f, r25	; 31
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:76
+ 18c:	8e bb       	out	0x1e, r24	; 30
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:78
+ 18e:	e0 9a       	sbi	0x1c, 0	; 28
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:81
+ 190:	01 97       	sbiw	r24, 0x01	; 1
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:86
+ 192:	0d b2       	in	r0, 0x1d	; 29
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:87
+ 194:	02 16       	cp	r0, r18
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:88
+ 196:	39 f0       	breq	.+14     	; 0x1a6 <eeprom_update_r18+0x20>
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:92
+ 198:	1c ba       	out	0x1c, r1	; 28
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:97
+ 19a:	2d bb       	out	0x1d, r18	; 29
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:98
+ 19c:	0f b6       	in	r0, 0x3f	; 63
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:99
+ 19e:	f8 94       	cli
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:100
+ 1a0:	e2 9a       	sbi	0x1c, 2	; 28
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:101
+ 1a2:	e1 9a       	sbi	0x1c, 1	; 28
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:102
+ 1a4:	0f be       	out	0x3f, r0	; 63
+/home/jenkins/agent/workspace/XC8/AVR/avr8-devices-pack/src/avr-libc/avr/lib/avr25/attiny85/../../../../libc/misc/eeupd_byte.S:103
+ 1a6:	08 95       	ret
+
+000001a8 <_exit>:
 exit():
- 158:	f8 94       	cli
+ 1a8:	f8 94       	cli
 
-0000015a <__stop_program>:
+000001aa <__stop_program>:
 __stop_program():
- 15a:	ff cf       	rjmp	.-2      	; 0x15a <__stop_program>
+ 1aa:	ff cf       	rjmp	.-2      	; 0x1aa <__stop_program>
