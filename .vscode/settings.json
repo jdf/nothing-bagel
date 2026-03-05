@@ -4,6 +4,12 @@
   "C_Cpp.default.cppStandard": "c++17",
   "C_Cpp.default.cStandard": "c11",
   "cmake.sourceDirectory": "/Users/jdf/MPLABProjects/GeminiRelayDriver/cmake/GeminiRelayDriver/default",
-  "git.enabled": false
+  "git.enabled": false,
+  "chat.tools.terminal.autoApprove": {
+    "/^jj status$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
+  }
 }
 

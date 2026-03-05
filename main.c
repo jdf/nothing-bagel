@@ -10,6 +10,8 @@
 #define RELAY_SET PB0
 #define RELAY_RESET PB1
 #define BTN_PIN PB2
+#define WATCHDOG_STATUS_LED PB3
+#define RELAY_STATUS_LED PB4
 
 // State Tracking
 volatile uint8_t wdt_checkin_flag = 0;
@@ -66,8 +68,9 @@ void toggle_relay() {
 
 int main(void) {
   // --- I/O Initialization ---
-  DDRB = (1 << RELAY_SET) | (1 << RELAY_RESET); // Relay pins as output
-  PORTB = (1 << BTN_PIN);                       // Enable pull-up on PB2 input
+  DDRB = (1 << RELAY_SET) | (1 << RELAY_RESET) | (1 << WATCHDOG_STATUS_LED) |
+         (1 << RELAY_STATUS_LED); // Enable status LED and relay pins as output
+  PORTB = (1 << BTN_PIN);         // Enable pull-up on PB2 input
 
   // --- Watchdog Setup ---
   // Enable watchdog with a 1-second timeout
@@ -105,13 +108,15 @@ int main(void) {
 
     if (wdt_checkin_flag) {
       wdt_checkin_flag = 0;
-      wdt_reset(); // Quarter-second check-in
+      wdt_reset();                         // Quarter-second check-in
+      PORTB ^= (1 << WATCHDOG_STATUS_LED); // Toggle the status LED
     }
 
     if (btn_pressed_flag) {
       btn_pressed_flag = 0;
       toggle_relay(); // Transition on switch close
       eeprom_update_byte(&stored_relay_state, relay_is_set);
+      PORTB ^= (1 << RELAY_STATUS_LED); // Toggle the relay status LED
     }
   }
 
