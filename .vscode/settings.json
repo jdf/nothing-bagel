@@ -3,7 +3,7 @@
   "C_Cpp.default.intelliSenseMode": "macos-gcc-x64",
   "C_Cpp.default.cppStandard": "c++17",
   "C_Cpp.default.cStandard": "c11",
-  "cmake.sourceDirectory": "/Users/jdf/MPLABProjects/GeminiRelayDriver/cmake/nothingbagel_relay_driver/default",
+  "cmake.sourceDirectory": "/Users/jdf/MPLABProjects/nothingbagel_relay_driver/cmake/nothingbagel_relay_driver/default",
   "git.enabled": false,
   "chat.tools.terminal.autoApprove": {
     "/^jj status$/": {
