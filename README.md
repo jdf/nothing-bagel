@@ -1,5 +1,5 @@
 
-# GeminiRelayDriver
+# nothingbagel_relay_driver
 
 ## Structure
 
@@ -9,17 +9,18 @@
 | cmake                                | Generated [CMake](https://cmake.org/) files. May be deleted if user.cmake has not been added                                        |
 | .vscode                              | See [VSCode](https://code.visualstudio.com/docs/getstarted/settings)                                                                |
 | .vscode/settings.json                | Workspace specific settings                                                                                                         |
-| .vscode/GeminiRelayDriver.mplab.json | The MPLAB project file, should not be deleted                                                                                       |
+| .vscode/nothingbagel_relay_driver.mplab.json | The MPLAB project file, should not be deleted                                                                                       |
 | out                                  | Final build artifacts                                                                                                               |
 
 ## CPU Clock (`F_CPU`)
 
-`F_CPU` is configured as a project-wide build flag in `cmake/GeminiRelayDriver/default/user.cmake`:
+`F_CPU` is configured as a project-wide build flag in 
+`cmake/nothingbagel_relay_driver/default/user.cmake`:
 
 `add_compile_definitions(F_CPU=1000000UL)`
 
 To change the clock speed, edit that value and then reconfigure/build:
 
-`cmake --preset GeminiRelayDriver_default_conf -S cmake/GeminiRelayDriver/default`
+`cmake --preset nothingbagel_relay_driver_default_conf -S cmake/nothingbagel_relay_driver/default`
 
-`cmake --build _build/GeminiRelayDriver/default`
+`cmake --build _build/nothingbagel_relay_driver/default`
