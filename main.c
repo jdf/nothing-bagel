@@ -10,16 +10,43 @@
 #define RELAY_SET PB0
 #define RELAY_RESET PB1
 #define BTN_PIN PB2
-#define WATCHDOG_STATUS_LED PB3
-#define RELAY_STATUS_LED PB4
+
+// Debug Pins (Optional)
+// These pins can be used to monitor the watchdog check-ins and relay state via
+// an LED or oscilloscope.
+#define WATCHDOG_STATUS_DBG_PIN PB3
+#define RELAY_STATUS_DBG_PIN PB4
 
 // State Tracking
 volatile uint8_t wdt_checkin_flag = 0;
 volatile uint8_t btn_pressed_flag = 0;
 uint8_t relay_is_set = 0;
 
-// Define a persistent byte in EEPROM
+// Store last known relay state in EEPROM
 uint8_t EEMEM stored_relay_state;
+
+// Do not call this function directly from the ISR.
+static void pulse_relay_pin(uint8_t pin) {
+  PORTB |= (1 << pin);
+  _delay_ms(10);
+  PORTB &= ~(1 << pin);
+}
+
+static void apply_relay_state(uint8_t new_state) {
+  relay_is_set = new_state;
+  if (relay_is_set > 1) {
+    relay_is_set = 0;
+  }
+
+  if (relay_is_set) {
+    pulse_relay_pin(RELAY_SET);
+    PORTB |= (1 << RELAY_STATUS_DBG_PIN);
+  } else {
+    pulse_relay_pin(RELAY_RESET);
+    PORTB &= ~(1 << RELAY_STATUS_DBG_PIN);
+  }
+  eeprom_update_byte(&stored_relay_state, relay_is_set);
+}
 
 // Timer0 Compare A Interrupt - Fires every 10ms
 ISR(TIMER0_COMPA_vect) {
@@ -50,27 +77,12 @@ ISR(TIMER0_COMPA_vect) {
   }
 }
 
-void toggle_relay() {
-  if (relay_is_set) {
-    // Pulse RESET coil for 10ms
-    PORTB |= (1 << RELAY_RESET);
-    _delay_ms(10);
-    PORTB &= ~(1 << RELAY_RESET);
-    relay_is_set = 0;
-  } else {
-    // Pulse SET coil for 10ms
-    PORTB |= (1 << RELAY_SET);
-    _delay_ms(10);
-    PORTB &= ~(1 << RELAY_SET);
-    relay_is_set = 1;
-  }
-}
-
 int main(void) {
   // --- I/O Initialization ---
-  DDRB = (1 << RELAY_SET) | (1 << RELAY_RESET) | (1 << WATCHDOG_STATUS_LED) |
-         (1 << RELAY_STATUS_LED); // Enable status LED and relay pins as output
-  PORTB = (1 << BTN_PIN);         // Enable pull-up on PB2 input
+  DDRB =
+      (1 << RELAY_SET) | (1 << RELAY_RESET) | (1 << WATCHDOG_STATUS_DBG_PIN) |
+      (1 << RELAY_STATUS_DBG_PIN); // Enable status LED and relay pins as output
+  PORTB = (1 << BTN_PIN);          // Enable pull-up on PB2 input
 
   // --- Watchdog Setup ---
   // Enable watchdog with a 1-second timeout
@@ -94,6 +106,9 @@ int main(void) {
     relay_is_set = 0; // Default to 0 if invalid
   }
 
+  // Re-apply saved state on boot.
+  apply_relay_state(relay_is_set);
+
   // --- Sleep Setup ---
   set_sleep_mode(SLEEP_MODE_IDLE);
   sleep_enable();
@@ -108,15 +123,13 @@ int main(void) {
 
     if (wdt_checkin_flag) {
       wdt_checkin_flag = 0;
-      wdt_reset();                         // Quarter-second check-in
-      PORTB ^= (1 << WATCHDOG_STATUS_LED); // Toggle the status LED
+      wdt_reset();                             // Quarter-second check-in
+      PORTB ^= (1 << WATCHDOG_STATUS_DBG_PIN); // Toggle the status LED
     }
 
     if (btn_pressed_flag) {
       btn_pressed_flag = 0;
-      toggle_relay(); // Transition on switch close
-      eeprom_update_byte(&stored_relay_state, relay_is_set);
-      PORTB ^= (1 << RELAY_STATUS_LED); // Toggle the relay status LED
+      apply_relay_state(!relay_is_set);
     }
   }
 
