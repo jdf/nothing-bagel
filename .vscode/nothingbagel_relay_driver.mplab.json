@@ -5,7 +5,7 @@
             "name": "default",
             "id": "conf1",
             "device": "ATtiny85",
-            "imagePath": "./out/nothingbagel_relay_driver/default.elf",
+            "imagePath": "./out/nothingbagel_switch_driver/default.elf",
             "packs": [
                 {
                     "name": "ATtiny_DFP",

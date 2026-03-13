@@ -7,45 +7,38 @@
 #include <util/delay.h>
 
 // Pin Definitions
-#define RELAY_SET PB0
-#define RELAY_RESET PB1
-#define BTN_PIN PB2
+#define FX_ACTIVE_OUT PB0
+#define MOMENTARY_BUTTON_IN PB2
 
 // Debug Pins (Optional)
-// These pins can be used to monitor the watchdog check-ins and relay state via
-// an LED or oscilloscope.
+// These pins can be used to monitor the watchdog check-ins and fx active state
+// via an LED or oscilloscope.
 #define WATCHDOG_STATUS_DBG_PIN PB3
-#define RELAY_STATUS_DBG_PIN PB4
+#define FX_STATUS_DBG_PIN PB4
 
 // State Tracking
 volatile uint8_t wdt_checkin_flag = 0;
 volatile uint8_t btn_pressed_flag = 0;
-uint8_t relay_is_set = 0;
+uint8_t effect_is_active = 0;
 
-// Store last known relay state in EEPROM
-uint8_t EEMEM stored_relay_state;
+// Store last known fx active state in EEPROM
+uint8_t EEMEM stored_fx_active_state;
 
-// Do not call this function directly from the ISR.
-static void pulse_relay_pin(uint8_t pin) {
-  PORTB |= (1 << pin);
-  _delay_ms(10);
-  PORTB &= ~(1 << pin);
-}
-
-static void apply_relay_state(uint8_t new_state) {
-  relay_is_set = new_state;
-  if (relay_is_set > 1) {
-    relay_is_set = 0;
+// Do not call this from an ISR.
+static void apply_effect_state(uint8_t new_state) {
+  effect_is_active = new_state;
+  if (effect_is_active > 1) {
+    effect_is_active = 0;
   }
 
-  if (relay_is_set) {
-    pulse_relay_pin(RELAY_SET);
-    PORTB |= (1 << RELAY_STATUS_DBG_PIN);
+  if (effect_is_active) {
+    PORTB |= (1 << FX_ACTIVE_OUT);
+    PORTB |= (1 << FX_STATUS_DBG_PIN);
   } else {
-    pulse_relay_pin(RELAY_RESET);
-    PORTB &= ~(1 << RELAY_STATUS_DBG_PIN);
+    PORTB &= ~(1 << FX_ACTIVE_OUT);
+    PORTB &= ~(1 << FX_STATUS_DBG_PIN);
   }
-  eeprom_update_byte(&stored_relay_state, relay_is_set);
+  eeprom_update_byte(&stored_fx_active_state, effect_is_active);
 }
 
 // Timer0 Compare A Interrupt - Fires every 10ms
@@ -63,14 +56,14 @@ ISR(TIMER0_COMPA_vect) {
 
   // 2. Handle Button Debouncing (Shift Register Method)
   // Read PB2, isolate the bit, and shift it into our history byte
-  uint8_t current_read = (PINB & (1 << BTN_PIN)) ? 1 : 0;
+  uint8_t current_read = (PINB & (1 << MOMENTARY_BUTTON_IN)) ? 1 : 0;
   btn_history = (btn_history << 1) | current_read;
 
   // Evaluate debounced state
   if (btn_history == 0x00 && btn_state == 1) {
     // Switch has been solidly CLOSED (low) for 80ms
     btn_state = 0;
-    btn_pressed_flag = 1; // Trigger relay transition on CLOSE
+    btn_pressed_flag = 1; // Trigger fx active transition on CLOSE
   } else if (btn_history == 0xFF && btn_state == 0) {
     // Switch has been solidly OPENED (high) for 80ms
     btn_state = 1; // State updated, but no action flagged
@@ -79,10 +72,9 @@ ISR(TIMER0_COMPA_vect) {
 
 int main(void) {
   // --- I/O Initialization ---
-  DDRB =
-      (1 << RELAY_SET) | (1 << RELAY_RESET) | (1 << WATCHDOG_STATUS_DBG_PIN) |
-      (1 << RELAY_STATUS_DBG_PIN); // Enable status LED and relay pins as output
-  PORTB = (1 << BTN_PIN);          // Enable pull-up on PB2 input
+  DDRB = (1 << FX_ACTIVE_OUT) | (1 << WATCHDOG_STATUS_DBG_PIN) |
+         (1 << FX_STATUS_DBG_PIN);    // Enable as output
+  PORTB = (1 << MOMENTARY_BUTTON_IN); // Enable pull-up on PB2 input
 
   // --- Watchdog Setup ---
   // Enable watchdog with a 1-second timeout
@@ -99,15 +91,15 @@ int main(void) {
   TIMSK = (1 << OCIE0A);              // Enable Timer0 Compare Match A Interrupt
 
   // Read last known state from EEPROM
-  relay_is_set = eeprom_read_byte(&stored_relay_state);
+  effect_is_active = eeprom_read_byte(&stored_fx_active_state);
 
   // Sanity check (EEPROM defaults to 0xFF on fresh chips)
-  if (relay_is_set > 1) {
-    relay_is_set = 0; // Default to 0 if invalid
+  if (effect_is_active > 1) {
+    effect_is_active = 0; // Default to 0 if invalid
   }
 
   // Re-apply saved state on boot.
-  apply_relay_state(relay_is_set);
+  apply_effect_state(effect_is_active);
 
   // --- Sleep Setup ---
   set_sleep_mode(SLEEP_MODE_IDLE);
@@ -120,7 +112,6 @@ int main(void) {
     sleep_cpu();
 
     // After waking up, check our flags:
-
     if (wdt_checkin_flag) {
       wdt_checkin_flag = 0;
       wdt_reset();                             // Quarter-second check-in
@@ -129,7 +120,7 @@ int main(void) {
 
     if (btn_pressed_flag) {
       btn_pressed_flag = 0;
-      apply_relay_state(!relay_is_set);
+      apply_effect_state(!effect_is_active);
     }
   }
 
