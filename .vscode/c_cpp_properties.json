@@ -1,0 +1,9 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "compileCommands": "${workspaceFolder}/_build/nothingbagel_driver/default/compile_commands.json"
+        }
+    ],
+    "version": 4
+}

@@ -15,7 +15,7 @@
             "command": "cmake",
             "args": [
                 "--build",
-                "_build/nothingbagel_relay_driver/default"
+                "_build/nothingbagel_driver/default"
             ],
             "group": {
                 "kind": "build",
@@ -36,7 +36,7 @@
                 "-b", "19200",
                 "-P", "${input:serialPort}",
                 "-U",
-                "flash:w:out/nothingbagel_relay_driver/default.hex:i"
+                "flash:w:out/nothingbagel_driver/default.hex:i"
             ],
             "dependsOn": "Build project",
             "group": "test",
