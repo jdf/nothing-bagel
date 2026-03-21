@@ -1,22 +1,5 @@
 {
-    "version": "1.8",
-    "configurations": [
-        {
-            "name": "default",
-            "id": "conf1",
-            "device": "ATtiny85",
-            "imagePath": "./out/nothingbagel_switch_driver/default.elf",
-            "packs": [
-                {
-                    "name": "ATtiny_DFP",
-                    "vendor": "Microchip",
-                    "version": "3.3.272"
-                }
-            ],
-            "fileSet": "default",
-            "toolchain": "default-AVR-GCC"
-        }
-    ],
+    "version": "1.9",
     "propertyGroups": [
         {
             "name": "default-AVR-GCC",
@@ -34,6 +17,24 @@
                     "exclude": "**/(_build|out|cmake|.vscode)/**/*"
                 }
             ]
+        }
+    ],
+    "configurations": [
+        {
+            "name": "default",
+            "id": "conf1",
+            "device": "ATtiny85",
+            "imagePath": "./out/nothingbagel_switch_driver/default.elf",
+            "packs": [
+                {
+                    "name": "ATtiny_DFP",
+                    "vendor": "Microchip",
+                    "version": "3.3.272"
+                }
+            ],
+            "fileSet": "default",
+            "toolchain": "default-AVR-GCC",
+            "includeLegacyMacros": true
         }
     ]
 }

@@ -1,9 +1,9 @@
 {
-  "C_Cpp.default.compileCommands": "${workspaceFolder}/_build/nothingbagel_switch_driver/default/compile_commands.json",
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/_build/nothingbagel_relay_driver/default/compile_commands.json",
   "C_Cpp.default.intelliSenseMode": "macos-gcc-x64",
   "C_Cpp.default.cppStandard": "c++17",
   "C_Cpp.default.cStandard": "c11",
-  "cmake.sourceDirectory": "${workspaceFolder}j /cmake/nothingbagel_switch_driver/default",
+  "cmake.sourceDirectory": "/Users/jdf/Desktop/nothingbagel/cmake/nothingbagel_relay_driver/default",
   "git.enabled": false,
   "chat.tools.terminal.autoApprove": {
     "/^jj status$/": {

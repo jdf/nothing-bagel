@@ -6,6 +6,18 @@
 
 #include <util/delay.h>
 
+// Pinout reminder:
+
+// ATtiny85 (DIP-8) physical pin mapping used by this firmware:
+//   Pin 1 -> PB5/RESET (not used here)
+//   Pin 2 -> PB3 = WATCHDOG_STATUS_DBG_PIN
+//   Pin 3 -> PB4 = FX_STATUS_DBG_PIN
+//   Pin 4 -> GND
+//   Pin 5 -> PB0 = FX_ACTIVE_OUT
+//   Pin 6 -> PB1 (not used here)
+//   Pin 7 -> PB2 = MOMENTARY_BUTTON_IN (active-low, pull-up enabled)
+//   Pin 8 -> VCC
+
 // Pin Definitions
 #define FX_ACTIVE_OUT PB0
 #define MOMENTARY_BUTTON_IN PB2
